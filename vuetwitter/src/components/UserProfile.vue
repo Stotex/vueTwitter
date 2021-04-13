@@ -40,7 +40,7 @@ export default {
           { id: 1, content: "Vue seems interesting!" },
           {
             id: 2,
-            content: "I am looking for cool projects to develop my skills!",
+            content: "Hit me up with cool projects so i can develop my skills!",
           },
         ],
       },
