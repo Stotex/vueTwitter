@@ -6,30 +6,7 @@
       <div class="user-profile__follower-count">
         <strong>Followers:</strong> {{ followers }}
       </div>
-      <form
-        class="user-profile__create-tweet"
-        @submit.prevent="createNewTweet"
-        :class="{ exceeded: newTweetCharacterCount > 160 }"
-      >
-        <label for="newTweet"
-          ><strong>New Tweet</strong>({{ newTweetCharacterCount }}/160)</label
-        >
-        <textarea id="newTweet" rows="4" v-model="newTweetContent" />
-
-        <div class="user-profile__create-tweet-type">
-          <label for="newTweetType"><strong>Type: </strong></label>
-          <select id="newTweetType" v-model="selectedTweetType">
-            <option
-              :value="option.value"
-              v-for="option in tweetTypes"
-              :key="option.id"
-            >
-              {{ option.name }}
-            </option>
-          </select>
-        </div>
-        <button>Tweet!</button>
-      </form>
+      <CreateTweetPanel @add-tweet="addTweet" />
     </div>
     <div class="user-profile__tweets-wrapper">
       <TweetItem
@@ -37,7 +14,6 @@
         :key="tweet.id"
         :username="user.username"
         :tweet="tweet"
-        @favourite="toggleFavourite"
       />
     </div>
   </div>
@@ -45,18 +21,13 @@
 
 <script>
 import TweetItem from "./TweetItem";
+import CreateTweetPanel from "./CreateTweetPanel";
 
 export default {
   name: "UserProfile",
-  components: { TweetItem },
+  components: { TweetItem, CreateTweetPanel },
   data() {
     return {
-      newTweetContent: "",
-      selectedTweetType: "instant",
-      tweetTypes: [
-        { value: "draft", name: "Draft" },
-        { value: "instant", name: "Instant Tweet" },
-      ],
       followers: 0,
       user: {
         id: 1,
@@ -75,40 +46,13 @@ export default {
       },
     };
   },
-  watch: {
-    followers(newFollowerCount, oldFollowerCount) {
-      if (oldFollowerCount < newFollowerCount) {
-        console.log(`${this.user.username} has gained a follower!`);
-      }
-    },
-  },
-  computed: {
-    fullname() {
-      return `${this.user.firstName} ${this.user.lastName}`;
-    },
-    newTweetCharacterCount() {
-      return this.newTweetContent.length;
-    },
-  },
   methods: {
-    followUser() {
-      this.followers++;
+    addTweet(tweet) {
+      this.user.tweets.unshift({
+        id: this.user.tweets.length + 1,
+        content: tweet,
+      });
     },
-    toggleFavourite(id) {
-      console.log(`Favourite Tweet #${id}`);
-    },
-    createNewTweet() {
-      if (this.newTweetContent && this.selectedTweetType !== "draft") {
-        this.user.tweets.unshift({
-          id: this.user.tweets.length + 1,
-          content: this.newTweetContent,
-        });
-        this.newTweetContent = "";
-      }
-    },
-  },
-  mounted() {
-    this.followUser();
   },
 };
 </script>
@@ -122,6 +66,9 @@ export default {
 }
 
 .user-profile__admin-badge {
+  background: rebeccapurple;
+  color: white;
+  padding: 5px;
   border: 1px solid #dfe3e8;
   margin: 5px auto 10px 0px;
   font-weight: bold;
